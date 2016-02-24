@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class PokemonDetailsVC: UIViewController {
 
@@ -21,13 +22,44 @@ class PokemonDetailsVC: UIViewController {
     @IBOutlet weak var nextLevelLabel: UILabel!
     @IBOutlet weak var currentLevelImage: UIImageView!
     @IBOutlet weak var nextLevelImage: UIImageView!
+    @IBOutlet weak var mainImage: UIImageView!
         
     var pokemon: Pokemon!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        nameLabel.text = pokemon.name
+        nameLabel.text = pokemon.name.capitalizedString
+        mainImage.image = UIImage(named: "\(pokemon.pokedexId)")
+        print(pokemon.pokedexId)
+        
+        pokemon.downloadPokemonDetails { () -> () in
+            // this will work after work is done
+            self.updateUI()
+        }
+    }
+    
+    func updateUI() {
+        pokeDescription.text = pokemon.description
+        typeLabel.text = pokemon.type
+        defenseLabel.text = pokemon.defense
+        weightLabel.text = pokemon.weight
+        heightLabel.text = pokemon.height
+        attackLabel.text = pokemon.attack
+        currentLevelImage.image = UIImage(named: "\(pokemon.pokedexId)")
+        
+        if pokemon.nextEvolutionID == "" {
+            nextLevelLabel.text = "No Evolution"
+            nextLevelImage.hidden = true
+        } else {
+            nextLevelImage.image = UIImage(named: "\(pokemon.nextEvolutionID)")
+            var str = "Next level: \(pokemon.nextEvolutionTxt)"
+            if pokemon.nextEvolutionLevel != "" {
+                str += " - LVL \(pokemon.nextEvolutionLevel)"
+            }
+            nextLevelLabel.text = str
+            
+        }
     }
 
     override func didReceiveMemoryWarning() {
